@@ -1,0 +1,35 @@
+{% extends 'template.html' %}
+
+{% block titulo %}
+Dashboard
+{% endblock %}
+
+{% block conteudo %}
+
+<h1>Integrantes</h1>
+<a href="{%url 'addIntegrante' %}"> Add Integrantes </a>
+{% for integrante in integrantes %}
+<p>
+    {% if integrante.foto_url %}
+        <img src="{{ integrante.foto_url }}" width="80px">
+    {% endif %}
+</p>
+    <p>
+        {{ integrante.nome }}
+        ({{ integrante.cargo }})
+    </p>
+     <p>
+        {{ integrante.biografia }}
+    </p>
+<br>
+    <form method="POST" action="{% url 'delIntegrante' integrante.id %}" onsubmit = "return confirm('Deseja realmente Excluir?');">
+        {% csrf_token %}
+        <input type="submit" value="Excluir">
+    </form>
+
+    <hr>
+{% empty %}
+    <p>Nenhum integrante cadastrado.</p>
+{% endfor %}
+
+{% endblock %}

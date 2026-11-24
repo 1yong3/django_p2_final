@@ -1,0 +1,38 @@
+{% extends "template.html" %}
+
+{% block titulo %}
+Meus Pedidos
+{% endblock %}
+
+{% block conteudo %}
+
+<h2>Meus Pedidos</h2>
+
+{% if pedidos %}
+    <ul>
+    {% for pedido in pedidos %}
+        <li>
+            <strong>Pedido {{ pedido.id }}</strong> - Data: {{ pedido.data|date:"d/m/Y H:i" }}
+            <br>
+            Total: R$ {{ pedido.total }}
+            <br>
+            Itens:
+            <ul>
+            {% for item in pedido.itens.all %}
+                <li>{{ item.servico.nome }} - {{ item.quantidade }}x - R$ {{ item.servico.preco }}</li>
+            {% empty %}
+                <li>Nenhum item neste pedido.</li>
+            {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhum pedido realizado.</p>
+{% endif %}
+
+<br>
+
+<a href="{% url 'produtos' %}" style="background:#6b917b;color:white;border:none;padding:10px 20px;border-radius:20px;text-decoration:none;">Continuar comprando</a>
+
+{% endblock %}

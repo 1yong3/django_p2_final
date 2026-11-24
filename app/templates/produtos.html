@@ -1,0 +1,56 @@
+{% extends "template.html" %}
+
+Produtos
+
+{% block conteudo %}
+ 
+<div class="product-grid">
+    <!-- Produtos Locais -->    <h3>Produtos Locais</h3>
+    <div class="local-products">
+        {% if servicos %}
+            {% for serv in servicos %}
+                <div class="product-card">
+                    <img src="/media/{{ serv.imagem }}" alt="{{ serv.nome }}" width="100px" style="display:block; margin:0 auto; object-fit:cover; border-radius:8px;">
+                    <h3>{{ serv.nome }}</h3>
+                    <p>R$ {{ serv.preco }}</p>
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'produtos' %}" style="margin-top:10px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="servico_id" value="{{ serv.id }}">
+                            <button type="submit" name="comprar" style="background:#28a745;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;">Comprar</button>
+                        </form>
+                    {% else %}
+                        <button style="background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;">Login para comprar</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Nenhum serviço cadastrado.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Produtos da API -->    <h3>Produtos da API Externa</h3>
+    <div class="api-products">
+        {% for prod in produtos_api %}
+            <div class="product-card">
+                <img src="{{ prod.image }}" alt="{{ prod.title }}" width="100px" style="display:block; margin:0 auto; object-fit:cover; border-radius:8px;">
+                <h3>{{ prod.title }}</h3>
+                <p>{{ prod.description }}</p>
+                <p>R$ {{ prod.price }}</p>
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'produtos' %}" style="margin-top:10px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="servico_id" value="{{ prod.id }}">
+                        <button type="submit" name="comprar" style="background:#28a745;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;">Comprar</button>
+                    </form>
+                {% else %}
+                    <button style="background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;">Login para comprar</button>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>Nenhum produto encontrado na API.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

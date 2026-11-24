@@ -1,0 +1,31 @@
+{% extends 'template.html' %}
+
+{% block titulo %}
+Contatos
+{% endblock %}
+
+{% block conteudo %}
+
+<h2>Contatos enviados</h2>
+
+{% for contato in contatos %}
+
+<div class="card">
+    <h3>{{ contato.nome }}</h3>
+
+    <p><strong>Email:</strong> {{ contato.email }}</p>
+    <p><strong>Telefone:</strong> {{ contato.telefone }}</p>
+    <p><strong>Mensagem:</strong> {{ contato.mensagem }}</p>
+
+    <a href="{% url 'excluir_contato' contato.id %}">
+        Excluir
+    </a>
+</div>
+
+{% empty %}
+
+<p>Nenhum contato enviado.</p>
+
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "template.html" %}
+
+{% block titulo %}
+Quem Somos
+{% endblock %}
+
+{% block conteudo %}
+
+<h1>Quem Somos</h1>
+
+<div class="container">
+    <div class="section-header">
+        <h2>Equipe</h2>
+    </div>
+    
+    {% if integrantes %}
+        <div class="team-grid">
+        {% for integrante in integrantes %}
+            <div class="team-card">
+                {% if integrante.foto_url %}
+                    <img src="{{ integrante.foto_url }}" alt="{{ integrante.nome }}" class="team-photo">
+                {% else %}
+                    <div class="placeholder-photo"></div>
+                {% endif %}
+                <h3>{{ integrante.nome }}</h3>
+                <p class="team-role">{{ integrante.cargo }}</p>
+                <p class="team-bio">{{ integrante.biografia|default:"Sem biografia disponível." }}</p>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>Nenhum integrante cadastrado.</p>
+    {% endif %}
+</div>
+
+<div class="section-footer" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+    <p>Mind Palace - Sistema de Gerenciamento Django</p>
+</div>
+
+{% endblock %}

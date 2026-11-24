@@ -1,0 +1,56 @@
+{% extends "template.html" %}
+
+{% block titulo %}Editar Serviço{% endblock %}
+
+{% block conteudo %}
+
+<div class="form-container">
+    <h2>Editar Serviço</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.nome.label_tag }}
+            {{ form.nome }}
+            {{ form.nome.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.descricao.label_tag }}
+            {{ form.descricao }}
+            {{ form.descricao.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.preco.label_tag }}
+            {{ form.preco }}
+            {{ form.preco.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.imagem.label_tag }}
+            {{ form.imagem }}
+            {{ form.imagem.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.categoria.label_tag }}
+            {{ form.categoria }}
+            {{ form.categoria.errors }}
+        </div>
+
+        <div class="form-group form-check">
+            {{ form.ativo }}
+            {{ form.ativo.label_tag }}
+            {{ form.ativo.errors }}
+        </div>
+
+        <div class="form-actions">
+            <input type="submit" value="Salvar" class="btn-submit">
+            <a href="{% url 'servico' %}" class="btn-back">Voltar</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

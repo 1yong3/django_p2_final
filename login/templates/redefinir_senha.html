@@ -1,0 +1,19 @@
+{% extends "template.html" %}
+
+{% block titulo %}
+Redefinir Senha
+{% endblock %}
+
+{% block conteudo %}
+
+<h2>Redefinir Senha</h2>
+
+<p>Insira sua nova senha abaixo.</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Definir nova senha</button>
+</form>
+
+{% endblock %}

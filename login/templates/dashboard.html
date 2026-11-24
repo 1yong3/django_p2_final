@@ -1,0 +1,30 @@
+{% extends 'template.html' %}
+
+{% block titulo %}
+Dashboard
+{% endblock %}
+
+{% block conteudo %}
+
+    <h2>Dashboard</h2>
+
+    <p>Olá, <strong>{{ user.username }}</strong>!</p>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'perfil' %}">Editar Perfil</a></li>
+            <li><a href="{% url 'contato' %}">Contatos</a></li>
+            <li><a href="{% url 'servico' %}">Serviços</a></li>
+            <li><a href="{% url 'integrantes' %}">Equipe</a></li>
+            <li><a href="{% url 'relatorio' %}">Relatórios</a></li>
+            <li><a href="{% url 'minhas_pedidos' %}">Meus Pedidos</a></li>
+        </ul>
+    </nav>
+
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <input type="submit" value="Sair">
+    </form>
+
+{% endblock %}
