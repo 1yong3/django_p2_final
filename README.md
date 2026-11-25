@@ -97,8 +97,10 @@ A equipe também pode ser editada em:
 - Ao salvar ou excluir no admin, os dados são enviados **automaticamente ao
   Supabase** (`app/signals.py`). A página `/quem-somos/` lê do Supabase e usa
   o cadastro local como fallback se ele estiver fora do ar.
-- O CRUD de **Equipe** do dashboard também sincroniza de volta para o admin,
-  para as duas telas não divergirem.
+- O CRUD de **Equipe** do dashboard usa o **mesmo cadastro do admin**
+  (`app.Integrante`) e funciona mesmo sem Supabase. Quando o Supabase está
+  configurado, a sincronização é automática; quando não está, a equipe é salva
+  apenas no banco do site — sem mensagem de erro.
 
 ## Supabase
 
@@ -115,7 +117,9 @@ create table integrantes (
 ```
 
 O cliente Supabase é opcional: se `SUPABASE_URL`/`SUPABASE_KEY` não estiverem
-definidas, o site continua funcionando e a equipe aparece vazia.
+definidas, a equipe continua sendo gerenciada pelo banco do site (admin e
+dashboard) e aparece normalmente em `/quem-somos/`. Quando configurado, o
+Supabase recebe uma cópia automática dos integrantes.
 
 ## Deploy no Render
 

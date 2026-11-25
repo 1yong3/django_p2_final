@@ -28,8 +28,19 @@ Novo Integrante
         </div>
 
         <div class="form-group">
-            <label for="foto">Foto (URL)</label>
-            <input type="url" name="foto" id="foto" placeholder="https://...">
+            <label for="foto">Foto (URL ou caminho)</label>
+            <input type="text" name="foto" id="foto" placeholder="/media/servicos/ic_quemsomos1.png">
+        </div>
+
+        <div class="form-group">
+            <label for="ordem">Ordem de exibição</label>
+            <input type="number" name="ordem" id="ordem" value="0" min="0">
+            <small style="color:#888;">Menor número aparece primeiro. Use 2 para o Criador ficar no centro.</small>
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" name="ativo" id="ativo" checked>
+            <label for="ativo" style="margin:0;">Ativo (aparece no site)</label>
         </div>
 
         <div class="form-actions">
