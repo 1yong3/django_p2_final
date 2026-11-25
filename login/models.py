@@ -18,15 +18,3 @@ class Perfil(models.Model):
 
     def __str__(self):
         return f'{self.usuario.username} - {self.tipo_usuario}'
-
-
-class Servico(models.Model):
-    nome = models.CharField(max_length=100)
-    descricao = models.TextField()
-    preco = models.DecimalField(max_digits=10, decimal_places=2)
-    imagem = models.ImageField(upload_to='servicos/', blank=True, null=True)
-    categoria = models.CharField(max_length=100)
-    ativo = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.nome

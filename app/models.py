@@ -32,8 +32,8 @@ class Servico(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Serviço'
-        verbose_name_plural = 'Serviços'
+        verbose_name = 'Produto'
+        verbose_name_plural = 'Produtos'
         ordering = ['nome']
 
     def __str__(self):

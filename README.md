@@ -56,6 +56,32 @@ Acesse `http://127.0.0.1:8000/`.
   ao logar é redirecionado para `/admin/`.
 - **Cliente**: ao logar é redirecionado para `/login/dashboard/`.
 
+## Gerenciar produtos pelo Django admin
+
+Todos os produtos exibidos em `/produtos/` vêm do modelo `app.Servico` e são
+administrados em:
+
+```
+/admin/  →  Loja (Produtos)  →  Produtos
+```
+
+1. Acesse `/admin/` e entre com o superusuário (`admin` / `admin123` por padrão).
+2. Em **Produtos**, clique em **Adicionar produto** ou edite um existente.
+3. Preencha nome, descrição, preço, imagem e mantenha **Ativo** marcado.
+4. Salve. O produto aparece imediatamente em `/produtos/` do site.
+
+Para ocultar um produto sem apagá-lo, desmarque **Ativo** (ou use a ação
+"Desativar selecionados"). A lista do admin mostra uma miniatura da imagem e
+permite editar preço e status diretamente na listagem.
+
+> Não existe mais o modelo duplicado `login.Servico` — antes ele aparecia como
+> um segundo "Serviços" no admin e fazia as edições não refletirem na loja.
+
+> Atenção: em produção, use `DATABASE_URL` (PostgreSQL) para que produtos e
+> logins sobrevivam a deploys. Imagens enviadas pelo admin ficam em `media/`,
+> que é efêmero no Render; arquivos versionados em `media/servicos/` funcionam
+> normalmente após o deploy.
+
 ## Supabase
 
 Tabela esperada `integrantes`:
