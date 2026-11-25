@@ -36,4 +36,9 @@ main{max-width:1200px;margin:20px auto;padding:0 20px}
 .btn-submit:hover{background:#5e806c}
 .btn-back{display:inline-block;background:#5a4761;color:white;text-decoration:none;padding:10px 30px;border-radius:20px;font-size:0.95rem;font-weight:600}
 .btn-back:hover{background:#4f3e55}
+.nav-btn{padding:9px 18px !important;font-weight:700;border:2px solid transparent}
+.nav-btn-light{background:#fff !important;color:#6b917b !important}
+.nav-btn-light:hover{background:#eef3f0 !important}
+.nav-btn-dark{background:#234B35 !important;color:#fff !important;border-color:#fff}
+.nav-btn-dark:hover{background:#1a3828 !important}
 .errorlist{list-style:none;color:#e74c3c;font-size:0.8rem;margin-top:4px}

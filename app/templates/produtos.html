@@ -62,7 +62,10 @@ Produtos
                 <p style="color:#5a4761;font-weight:700;">R$ {{ prod.price }}</p>
             </div>
         {% empty %}
-            <p style="color:#888;">Nenhum produto encontrado na API externa.</p>
+            <p style="color:#888;">
+                Nenhum produto encontrado na API externa no momento.
+                A página de produtos locais continua funcionando normalmente.
+            </p>
         {% endfor %}
     </div>
 </div>

@@ -21,13 +21,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "django-insecure-chave-apenas-para-desenvolvimento"
-)
+# Em produção no Render, se DEBUG não for informado, assume False para não
+# expor tracebacks e configurações sensíveis nas páginas de erro.
+if os.getenv("RENDER") and "DEBUG" not in os.environ:
+    DEBUG = False
 
-if not DEBUG and SECRET_KEY == "django-insecure-chave-apenas-para-desenvolvimento":
-    raise ValueError("Configure uma SECRET_KEY segura no Render.")
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-chave-apenas-para-desenvolvimento"
+    else:
+        import secrets
+
+        SECRET_KEY = secrets.token_urlsafe(50)
+        print(
+            "AVISO: SECRET_KEY não definida. Usando uma chave temporária; "
+            "defina SECRET_KEY nas variáveis de ambiente para manter as sessões."
+        )
 
 ALLOWED_HOSTS = [
     host.strip()

@@ -266,16 +266,88 @@ def _recalcular_total(pedido):
     pedido.save(update_fields=['total'])
 
 
+def _normalizar_fakestore(dados):
+    """Converte a resposta da Fake Store API no formato usado pelo template."""
+    if not isinstance(dados, list):
+        return []
+
+    return [
+        {
+            'title': item.get('title', ''),
+            'description': item.get('description', ''),
+            'price': item.get('price', ''),
+            'image': item.get('image', ''),
+        }
+        for item in dados
+        if isinstance(item, dict)
+    ]
+
+
+def _normalizar_dummyjson(dados):
+    """Converte a resposta da DummyJSON no formato usado pelo template."""
+    if not isinstance(dados, dict):
+        return []
+
+    itens = dados.get('products', [])
+    if not isinstance(itens, list):
+        return []
+
+    produtos = []
+    for item in itens:
+        if not isinstance(item, dict):
+            continue
+
+        imagens = item.get('images') or []
+        imagem = item.get('thumbnail') or (imagens[0] if imagens else '')
+
+        produtos.append({
+            'title': item.get('title', ''),
+            'description': item.get('description', ''),
+            'price': item.get('price', ''),
+            'image': imagem,
+        })
+
+    return produtos
+
+
+# API externa usada na página de produtos. A primeira que responder com JSON
+# válido é utilizada; se todas falharem, a página continua funcionando sem os
+# produtos externos (evita JSONDecodeError/500).
+FONTES_PRODUTOS_API = (
+    ('https://fakestoreapi.com/products', _normalizar_fakestore),
+    ('https://dummyjson.com/products?limit=12', _normalizar_dummyjson),
+)
+
+
+def _buscar_produtos_api(limite=12):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (compatible; MindPalace/1.0)',
+        'Accept': 'application/json',
+    }
+
+    for url, normalizar in FONTES_PRODUTOS_API:
+        try:
+            resposta = requests.get(url, timeout=8, headers=headers)
+            resposta.raise_for_status()
+
+            content_type = resposta.headers.get('Content-Type', '').lower()
+            if 'json' not in content_type:
+                continue
+
+            dados = resposta.json()
+        except (requests.RequestException, ValueError):
+            continue
+
+        produtos = normalizar(dados)
+        if produtos:
+            return produtos[:limite]
+
+    return []
+
+
 def produtos(request):
     servicos = Servico.objects.filter(ativo=True)
-
-    produtos_api = []
-    try:
-        resposta = requests.get('https://fakestoreapi.com/products', timeout=10)
-        if resposta.ok:
-            produtos_api = resposta.json()
-    except requests.RequestException:
-        produtos_api = []
+    produtos_api = _buscar_produtos_api()
 
     if request.method == 'POST' and 'comprar' in request.POST:
         if not request.user.is_authenticated:
