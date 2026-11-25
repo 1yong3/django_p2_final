@@ -125,16 +125,37 @@ def _buscar_integrantes():
         return []
 
 
+# Ordem de exibição em "Quem Somos": o Criador deve ficar no meio.
+ORDEM_CARGOS_QUEM_SOMOS = {
+    'desenvolvedor': 0,
+    'criador': 1,
+    'tester': 2,
+}
+
+
+def _ordenar_integrantes(integrantes):
+    return sorted(
+        integrantes,
+        key=lambda item: (
+            ORDEM_CARGOS_QUEM_SOMOS.get(
+                (item.get('cargo') or '').strip().lower(),
+                99,
+            ),
+            str(item.get('nome') or '').lower(),
+        ),
+    )
+
+
 @admin_required
 def integrantes(request):
     return render(request, 'integrantes.html', {
-        'integrantes': _buscar_integrantes(),
+        'integrantes': _ordenar_integrantes(_buscar_integrantes()),
     })
 
 
 def quem_somos(request):
     return render(request, 'quem_somos.html', {
-        'integrantes': _buscar_integrantes(),
+        'integrantes': _ordenar_integrantes(_buscar_integrantes()),
     })
 
 
