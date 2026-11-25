@@ -146,6 +146,42 @@ def _ordenar_integrantes(integrantes):
     )
 
 
+# Equipe exibida em "Quem Somos" quando o Supabase está indisponível/sem dados.
+# As fotos são os ícones locais enviados para media/servicos.
+EQUIPE_PADRAO = [
+    {
+        'id': 'local-1',
+        'nome': 'Iago',
+        'cargo': 'Criador',
+        'biografia': (
+            'Idealizador do Mind Palace, responsável pela visão do projeto '
+            'e pela experiência do usuário.'
+        ),
+        'foto_url': '/media/servicos/ic_quemsomos1.png',
+    },
+    {
+        'id': 'local-2',
+        'nome': 'Diogenes',
+        'cargo': 'Desenvolvedor',
+        'biografia': (
+            'Responsável pela implementação do sistema, integrações e '
+            'banco de dados.'
+        ),
+        'foto_url': '/media/servicos/icone_quemomos3-removebg-preview.png',
+    },
+    {
+        'id': 'local-3',
+        'nome': 'Platão',
+        'cargo': 'Tester',
+        'biografia': (
+            'Garante a qualidade das entregas com testes e validação das '
+            'funcionalidades.'
+        ),
+        'foto_url': '/media/servicos/icone_quemsomos2-removebg-preview.png',
+    },
+]
+
+
 @admin_required
 def integrantes(request):
     return render(request, 'integrantes.html', {
@@ -154,8 +190,14 @@ def integrantes(request):
 
 
 def quem_somos(request):
+    integrantes = _ordenar_integrantes(_buscar_integrantes())
+
+    # Nunca deixa a página vazia: se o Supabase falhar, usa a equipe local.
+    if not integrantes:
+        integrantes = _ordenar_integrantes(EQUIPE_PADRAO)
+
     return render(request, 'quem_somos.html', {
-        'integrantes': _ordenar_integrantes(_buscar_integrantes()),
+        'integrantes': integrantes,
     })
 
 

@@ -19,28 +19,28 @@ SERVICOS = [
         'descricao': 'Site responsivo com até 5 páginas, formulário de contato e SEO básico.',
         'preco': Decimal('1200.00'),
         'categoria': 'Desenvolvimento',
-        'imagem': 'servicos/fundo-mindpalace.png',
+        'imagem': 'servicos/8832880-removebg-preview.png',
     },
     {
         'nome': 'Sistema de Gestão',
         'descricao': 'Aplicação web para controle de clientes, serviços e pedidos.',
         'preco': Decimal('3500.00'),
         'categoria': 'Desenvolvimento',
-        'imagem': 'servicos/mind_palace_logo.png',
+        'imagem': 'servicos/2232688-removebg-preview.png',
     },
     {
         'nome': 'Identidade Visual',
         'descricao': 'Criação de logotipo, paleta de cores e manual de marca.',
         'preco': Decimal('800.00'),
         'categoria': 'Design',
-        'imagem': 'servicos/Terry_Crews_by_Gage_Skidmore_5.jpg',
+        'imagem': 'servicos/images-removebg-preview (2).png',
     },
     {
         'nome': 'Consultoria em TI',
         'descricao': 'Diagnóstico da infraestrutura e plano de melhorias.',
         'preco': Decimal('450.00'),
         'categoria': 'Consultoria',
-        'imagem': 'servicos/Fotos-de-Macacos-2.jpg',
+        'imagem': 'servicos/ic_ideia1-removebg-preview.png',
     },
 ]
 
