@@ -97,6 +97,8 @@ def cadastro(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
 
+    next_url = request.POST.get('next') or request.GET.get('next') or ''
+
     if request.method == 'POST':
         form = CadastroForm(request.POST)
 
@@ -106,9 +108,25 @@ def cadastro(request):
                 usuario=usuario,
                 defaults={'tipo_usuario': 'cliente'},
             )
-            messages.success(request, 'Conta criada com sucesso. Faça login.')
-            return redirect('login')
+
+            # Já deixa o usuário logado após o cadastro (antes ele era
+            # redirecionado para o login e parecia que a conta não existia).
+            auth_login(
+                request,
+                usuario,
+                backend='django.contrib.auth.backends.ModelBackend',
+            )
+            messages.success(request, 'Conta criada com sucesso. Bem-vindo(a)!')
+
+            if (
+                next_url
+                and _next_is_safe(request, next_url)
+                and not is_admin(usuario)
+            ):
+                return redirect(next_url)
+
+            return redirect(_redirect_for(usuario))
     else:
         form = CadastroForm()
 
-    return render(request, 'cadastro.html', {'form': form})
+    return render(request, 'cadastro.html', {'form': form, 'next': next_url})

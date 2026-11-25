@@ -19,6 +19,13 @@ def _bootstrap():
     from django.core.management import call_command
 
     try:
+        from projeto.diagnostico import linha_bootstrap
+
+        print(linha_bootstrap(), flush=True)
+    except Exception as exc:  # pragma: no cover
+        print(f'AVISO: não foi possível gerar o diagnóstico: {exc}', flush=True)
+
+    try:
         call_command('migrate', interactive=False, verbosity=0)
     except Exception as exc:  # pragma: no cover - apenas log em produção
         print(f'AVISO: falha ao aplicar migrações automaticamente: {exc}')

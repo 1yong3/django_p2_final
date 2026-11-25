@@ -26,18 +26,26 @@ DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 if os.getenv("RENDER") and "DEBUG" not in os.environ:
     DEBUG = False
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = (os.getenv("SECRET_KEY") or "").strip()
+SECRET_KEY_SOURCE = "variavel de ambiente"
 
 if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = "django-insecure-chave-apenas-para-desenvolvimento"
-    else:
-        import secrets
+    # IMPORTANTE: a SECRET_KEY assina os cookies de sessão. Se ela mudar a cada
+    # reinício (como acontecia com uma chave aleatória), TODOS os usuários são
+    # deslogados. Por isso derivamos uma chave estável a partir do DATABASE_URL
+    # (que só existe no servidor) quando a variável SECRET_KEY não é informada.
+    import hashlib
 
-        SECRET_KEY = secrets.token_urlsafe(50)
+    base = os.getenv("DATABASE_URL", "").strip() or "mind-palace-desenvolvimento"
+    SECRET_KEY = hashlib.sha256(
+        f"mind-palace::secret::{base}".encode("utf-8")
+    ).hexdigest()
+    SECRET_KEY_SOURCE = "derivada do DATABASE_URL (defina SECRET_KEY no Render)"
+
+    if not DEBUG:
         print(
-            "AVISO: SECRET_KEY não definida. Usando uma chave temporária; "
-            "defina SECRET_KEY nas variáveis de ambiente para manter as sessões."
+            "AVISO: SECRET_KEY nao definida. Usando chave estavel derivada do "
+            "DATABASE_URL. Defina SECRET_KEY nas variaveis de ambiente."
         )
 
 ALLOWED_HOSTS = [
@@ -244,6 +252,24 @@ MAILERS = {
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/login/dashboard"
 LOGOUT_REDIRECT_URL = "/login/"
+
+# =====================================================
+# SESSÕES (mantém o usuário logado)
+# =====================================================
+# As sessões ficam gravadas no banco de dados (PostgreSQL em produção), então
+# sobrevivem a reinícios/deploys do Render. Com SQLite efêmero, elas se perdem
+# a cada novo deploy — configure DATABASE_URL para persistir.
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_AGE = int(
+    os.getenv("SESSION_COOKIE_AGE", str(60 * 60 * 24 * 30))
+)  # 30 dias
+SESSION_SAVE_EVERY_REQUEST = True  # renova a validade a cada acesso
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
+# Guarda por quanto tempo o usuário continua logado mesmo sem acessar o site.
+SESSION_COOKIE_AGE = max(SESSION_COOKIE_AGE, 60 * 60 * 24)
 
 # =====================================================
 # REDIRECIONAMENTO POR TIPO DE USUÁRIO

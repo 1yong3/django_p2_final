@@ -119,6 +119,45 @@ Start Command seja apenas `gunicorn projeto.wsgi:application`.
 > Com `DATABASE_URL` configurada, o SQLite deixa de ser usado e todos os dados
 > (usuários, serviços, pedidos, contatos) ficam no PostgreSQL do Render.
 
+### Problemas com login (usuário deslogado / conta desaparece)
+
+Sintomas: ao criar uma conta o usuário volta para o login, ou precisa criar
+outra conta depois de algum tempo.
+
+Causas mais comuns:
+
+1. O Render está usando **SQLite efêmero** (sem `DATABASE_URL`) → contas e
+   sessões são apagadas a cada deploy/reinício.
+2. A `SECRET_KEY` mudava a cada boot → todos os cookies de sessão deixavam de
+   valer.
+
+Para diagnosticar, abra o **Shell** do Render e rode:
+
+```bash
+python manage.py verificar_sessao
+```
+
+A saída esperada em produção:
+
+```
+Banco de dados.....: PostgreSQL (...)
+DATABASE_URL.......: definida
+SECRET_KEY.........: variavel de ambiente
+Sessões............: django.contrib.sessions.backends.db
+Duração da sessão..: 30.0 dias
+```
+
+Se aparecer **SQLite** ou **NÃO definida**, configure as variáveis no painel
+do Render (`DATABASE_URL` e `SECRET_KEY`) e faça um novo deploy.
+
+Detalhes da configuração aplicada:
+
+- Sessões gravadas no banco (`SESSION_ENGINE = db`), válidas por **30 dias** e
+  renovadas a cada acesso.
+- Sem `SECRET_KEY`, o projeto gera uma chave **estável** derivada do
+  `DATABASE_URL`, em vez de uma chave aleatória a cada reinício.
+- Após o cadastro o usuário já entra **automaticamente** no Dashboard.
+
 ### Migrar dados do SQLite para o PostgreSQL (opcional)
 
 ```bash
