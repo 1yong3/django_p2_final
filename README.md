@@ -75,12 +75,21 @@ ALLOWED_HOSTS=<seu-servico>.onrender.com
 CSRF_TRUSTED_ORIGINS=https://<seu-servico>.onrender.com
 SUPABASE_URL=https://<projeto>.supabase.co
 SUPABASE_KEY=<chave>
+
+# PostgreSQL do Render (Internal Database URL)
+DATABASE_URL=postgresql://usuario:senha@host-interno:5432/banco
+
 # opcionais
 DJANGO_SUPERUSER_USERNAME=admin
 DJANGO_SUPERUSER_PASSWORD=<senha>
 DJANGO_SUPERUSER_EMAIL=admin@exemplo.com
 SEED_DEMO=1
 ```
+
+> Use a **Internal Database URL** do PostgreSQL do Render (host interno, sem SSL).
+> A senha **não deve** ser colocada no código nem no GitHub — apenas nas
+> variáveis de ambiente do Render.
+> Sem `DATABASE_URL`, o projeto usa SQLite automaticamente (desenvolvimento local).
 
 Build Command:
 
@@ -95,8 +104,23 @@ Start Command:
 ```
 
 O `projeto/wsgi.py` também aplica as migrações automaticamente ao iniciar,
-garantindo que o SQLite tenha as tabelas mesmo que o Start Command seja apenas
-`gunicorn projeto.wsgi:application`.
+garantindo que o banco (PostgreSQL ou SQLite) tenha as tabelas mesmo que o
+Start Command seja apenas `gunicorn projeto.wsgi:application`.
+
+> Com `DATABASE_URL` configurada, o SQLite deixa de ser usado e todos os dados
+> (usuários, serviços, pedidos, contatos) ficam no PostgreSQL do Render.
+
+### Migrar dados do SQLite para o PostgreSQL (opcional)
+
+```bash
+# 1) exporta os dados do banco local
+python manage.py dumpdata --natural-foreign --natural-primary \
+  -e contenttypes -e auth.Permission -e admin.logentry -e sessions.session \
+  -o dados.json
+
+# 2) importa no PostgreSQL do Render (use a External Database URL na sua máquina)
+DATABASE_URL="postgresql://...URL-externa..." python manage.py loaddata dados.json
+```
 
 > O SQLite no Render é **efêmero**: os dados são reiniciados a cada deploy.
 > Para persistência use um Render Disk ou PostgreSQL.

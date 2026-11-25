@@ -128,13 +128,56 @@ TEMPLATES = [
 # =====================================================
 # BANCO DE DADOS
 # =====================================================
+# Em produção (Render/PostgreSQL) configure a variável DATABASE_URL com a
+# "Internal Database URL" do seu banco. Sem ela, o projeto usa SQLite, ideal
+# para desenvolvimento local.
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
+
+def _database_from_url(url):
+    """Converte postgres://usuario:senha@host:porta/banco em config do Django."""
+    from urllib.parse import parse_qs, unquote, urlparse
+
+    parsed = urlparse(url)
+
+    if parsed.scheme not in ("postgres", "postgresql"):
+        raise ValueError(
+            "DATABASE_URL deve começar com postgres:// ou postgresql://"
+        )
+
+    config = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": unquote(parsed.path.lstrip("/")),
+        "USER": unquote(parsed.username or ""),
+        "PASSWORD": unquote(parsed.password or ""),
+        "HOST": parsed.hostname or "",
+        "PORT": parsed.port or "",
+        "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "600")),
+        "CONN_HEALTH_CHECKS": True,
     }
-}
+
+    query = parse_qs(parsed.query)
+    options = {}
+
+    if query.get("sslmode"):
+        options["sslmode"] = query["sslmode"][0]
+
+    if options:
+        config["OPTIONS"] = options
+
+    return config
+
+
+if DATABASE_URL:
+    DATABASES = {"default": _database_from_url(DATABASE_URL)}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # =====================================================
 # VALIDAÇÃO DE SENHAS
