@@ -173,8 +173,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # E-MAIL
 # =====================================================
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
 MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',

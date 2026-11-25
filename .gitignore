@@ -2,8 +2,11 @@ __pycache__/
 *.py[cod]
 venv/
 .venv/
+vev/
+djando_aula/
 .env
 db.sqlite3
+staticfiles/
 .pytest_cache/
 .idea/
 .vscode/
