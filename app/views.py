@@ -232,7 +232,11 @@ def produtos(request):
         else:
             return redirect('login')
 
-    return render(request, "produtos.html", {'produtos':servicos, 'produtos_api': produtos_api})
+    return render(request, "produtos.html", {
+        'servicos': servicos,
+        'produtos': servicos,
+        'produtos_api': produtos_api,
+    })
 
 
 @login_required
