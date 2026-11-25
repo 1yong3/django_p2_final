@@ -129,3 +129,16 @@ nav a{margin-left:0}
     .team-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
     .team-hero h1{font-size:1.75rem}
 }
+
+/* Marca "Mind Palace" ao lado do ícone (cabeçalho e home) */
+.brand-lockup{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+.brand-lockup:hover{opacity:.9}
+.brand-text{font-size:1.35rem;font-weight:700;letter-spacing:0.3px;white-space:nowrap}
+.home-brand{display:flex;align-items:center;justify-content:center;gap:18px;margin:10px 0 30px 0}
+.home-brand span{font-size:2.3rem;font-weight:700;color:#234B35;letter-spacing:0.5px;line-height:1.1;text-align:left}
+@media(max-width:640px){
+    .brand-text{font-size:1.1rem}
+    .home-brand{gap:12px}
+    .home-brand img{width:76px !important;height:76px !important}
+    .home-brand span{font-size:1.6rem}
+}
