@@ -108,13 +108,20 @@ def editServico(request, id_servico):
 
 
 def integrantes(request):
+    if supabase is None:
+        return render(request, "integrantes.html", {'integrantes': []})
     resposta = supabase.table("integrantes").select("*").execute()
     return render(request, "integrantes.html", {'integrantes': resposta.data})
 
 
 def quem_somos(request):
-    resposta = supabase.table("integrantes").select("*").execute()
-    return render(request, "quem_somos.html", {'integrantes': resposta.data})
+    integrantes = []
+    if supabase is not None:
+        try:
+            integrantes = supabase.table("integrantes").select("*").execute().data
+        except Exception:
+            integrantes = []
+    return render(request, "quem_somos.html", {'integrantes': integrantes})
 
 
 def addIntegrante(request):

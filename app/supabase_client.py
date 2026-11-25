@@ -1,13 +1,18 @@
-from dotenv import load_dotenv 
-from supabase import create_client 
-import os 
+from dotenv import load_dotenv
+import os
 
-load_dotenv()   
+load_dotenv()
 
-SUPABASE_URL = os.getenv("SUPABASE_URL") 
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")   
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-if not SUPABASE_URL or not SUPABASE_KEY: 
-    raise RuntimeError("Configure SUPABASE_URL e SUPABASE_KEY no arquivo .env") 
+# Cliente opcional: se as variáveis não estiverem configuradas (ex.: no Render,
+# onde o .env não é enviado), o app continua funcionando sem quebrar o import.
+supabase = None
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY,) 
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        from supabase import create_client
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception:
+        supabase = None
