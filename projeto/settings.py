@@ -162,16 +162,6 @@ STATIC_URL = '/static/'
 # Pasta onde o collectstatic reunirá os arquivos
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Configuração do armazenamento de arquivos
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
-
 # =====================================================
 # ARQUIVOS DE MÍDIA
 # =====================================================
