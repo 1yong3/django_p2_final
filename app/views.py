@@ -315,11 +315,11 @@ def _normalizar_dummyjson(dados):
 # produtos externos (evita JSONDecodeError/500).
 FONTES_PRODUTOS_API = (
     ('https://fakestoreapi.com/products', _normalizar_fakestore),
-    ('https://dummyjson.com/products?limit=12', _normalizar_dummyjson),
+    ('https://dummyjson.com/products?limit=4', _normalizar_dummyjson),
 )
 
 
-def _buscar_produtos_api(limite=12):
+def _buscar_produtos_api(limite=4):
     headers = {
         'User-Agent': 'Mozilla/5.0 (compatible; MindPalace/1.0)',
         'Accept': 'application/json',

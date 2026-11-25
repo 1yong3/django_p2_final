@@ -19,6 +19,18 @@ Produtos
 
     <!-- Produtos Locais -->
     <h3 style="color:#234B35; margin-top:25px;">Produtos Locais</h3>
+
+    {% if not user.is_authenticated %}
+        <div style="background:#fff8e1;border-left:4px solid #f0ad4e;border-radius:8px;padding:14px 16px;margin:12px 0 18px 0;color:#6b5a2e;font-size:0.92rem;">
+            <strong>Faça login para Comprar</strong> —
+            <a href="{% url 'login' %}?next={% url 'produtos' %}" style="color:#234B35;font-weight:700;">
+                entre na sua conta
+            </a>
+            ou
+            <a href="{% url 'cadastro' %}" style="color:#234B35;font-weight:700;">cadastre-se</a>.
+        </div>
+    {% endif %}
+
     <div style="display:flex; flex-wrap:wrap; gap:18px;">
         {% for serv in servicos %}
             <div style="width:240px; background:#fff; padding:16px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.08); text-align:center;">
@@ -41,7 +53,7 @@ Produtos
                 {% else %}
                     <a href="{% url 'login' %}?next={% url 'produtos' %}"
                        style="display:inline-block;background:#6c757d;color:#fff;padding:9px 18px;border-radius:20px;text-decoration:none;font-weight:600;">
-                        Entrar para comprar
+                        Faça login para Comprar
                     </a>
                 {% endif %}
             </div>
