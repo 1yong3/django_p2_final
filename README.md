@@ -20,11 +20,20 @@ pip install -r requirements.txt
 cp .env.example .env        # preencha SUPABASE_URL / SUPABASE_KEY
 python manage.py migrate
 python manage.py seed_demo  # opcional: categorias e serviços de exemplo
-python manage.py createsuperuser
+python manage.py createsuperuser  # opcional: a migração já cria o admin padrão
 python manage.py runserver
 ```
 
 Acesse `http://127.0.0.1:8000/`.
+
+### Acesso inicial (criado pela migração)
+
+| Usuário | Senha | Perfil |
+|---|---|---|
+| `admin` | `admin123` | Superusuário / Administrador |
+
+> Troque essa senha em produção (Django admin → usuário `admin` → alterar senha).
+
 
 ## Funcionalidades
 
