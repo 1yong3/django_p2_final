@@ -6,26 +6,44 @@ Contatos
 
 {% block conteudo %}
 
-<h2>Contatos enviados</h2>
+<div style="max-width:1000px;margin:0 auto;padding:10px 20px 30px 20px;">
 
-{% for contato in contatos %}
+    <h2 style="color:#6b917b;margin-bottom:8px;">Contatos</h2>
+    <p style="color:#777;font-size:0.9rem;margin-bottom:18px;">
+        Mensagens recebidas pelo formulário de contato do site.
+    </p>
 
-<div class="card">
-    <h3>{{ contato.nome }}</h3>
+    {% if contatos %}
+        {% for contato in contatos %}
+            <div style="background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.08);padding:20px;margin-bottom:16px;border-left:4px solid #6b917b;">
+                <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <h3 style="color:#234B35;margin:0;">{{ contato.nome }}</h3>
+                    <span style="color:#999;font-size:0.85rem;">
+                        {{ contato.email }}
+                        {% if contato.telefone %} &middot; {{ contato.telefone }}{% endif %}
+                    </span>
+                </div>
 
-    <p><strong>Email:</strong> {{ contato.email }}</p>
-    <p><strong>Telefone:</strong> {{ contato.telefone }}</p>
-    <p><strong>Mensagem:</strong> {{ contato.mensagem }}</p>
+                <p style="color:#555;line-height:1.6;margin:12px 0 16px 0;">{{ contato.mensagem }}</p>
 
-    <a href="{% url 'excluir_contato' contato.id %}">
-        Excluir
-    </a>
+                <form method="post" action="{% url 'excluir_contato' contato.id %}"
+                      onsubmit="return confirm('Deseja realmente excluir esta mensagem?');"
+                      style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-action btn-delete"
+                            style="border:none;cursor:pointer;font:inherit;">Excluir</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div style="background:#fff;border-radius:12px;padding:25px;color:#888;text-align:center;">
+            Nenhuma mensagem recebida até o momento.
+        </div>
+    {% endif %}
+
+    <p style="margin-top:25px;">
+        <a href="{% url 'dashboard' %}" class="btn-back" style="text-decoration:none;">Voltar ao Dashboard</a>
+    </p>
 </div>
-
-{% empty %}
-
-<p>Nenhum contato enviado.</p>
-
-{% endfor %}
 
 {% endblock %}

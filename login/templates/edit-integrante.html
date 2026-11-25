@@ -1,0 +1,51 @@
+{% extends 'template.html' %}
+
+{% block titulo %}
+Editar Integrante
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="form-container">
+    <h2>Editar Integrante</h2>
+
+    {% if integrante %}
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" id="nome" value="{{ integrante.nome }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cargo">Cargo</label>
+                <input type="text" name="cargo" id="cargo" value="{{ integrante.cargo }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="biografia">Biografia</label>
+                <textarea name="biografia" id="biografia" required>{{ integrante.biografia }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="foto">Foto (URL)</label>
+                <input type="url" name="foto" id="foto" value="{{ integrante.foto_url }}">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Salvar</button>
+                <a href="{% url 'integrantes' %}" class="btn-back">Voltar</a>
+            </div>
+        </form>
+    {% else %}
+        <p style="color:#888;text-align:center;">
+            Integrante não encontrado (ou Supabase não configurado).
+        </p>
+        <p style="text-align:center;margin-top:15px;">
+            <a href="{% url 'integrantes' %}" class="btn-back">Voltar</a>
+        </p>
+    {% endif %}
+</div>
+
+{% endblock %}

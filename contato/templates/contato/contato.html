@@ -6,14 +6,44 @@ Contato
 
 {% block conteudo %}
 
-<h2>Entre em contato</h2>
+<div class="form-container">
+    <h2>Entre em contato</h2>
 
-<form method="post">
-    {% csrf_token %}
+    <p style="color:#666;font-size:0.92rem;text-align:center;margin-bottom:20px;">
+        Envie dúvidas, sugestões ou solicitações. Não é necessário estar logado.
+    </p>
 
-    {{ form.as_p }}
+    <form method="post">
+        {% csrf_token %}
 
-    <button type="submit">Enviar</button>
-</form>
+        <div class="form-group">
+            <label for="id_nome">Nome</label>
+            {{ form.nome }}
+            {{ form.nome.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_email">E-mail</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_telefone">Telefone</label>
+            {{ form.telefone }}
+            {{ form.telefone.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_mensagem">Mensagem</label>
+            {{ form.mensagem }}
+            {{ form.mensagem.errors }}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">Enviar</button>
+        </div>
+    </form>
+</div>
 
 {% endblock %}

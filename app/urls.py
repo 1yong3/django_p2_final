@@ -11,12 +11,14 @@ urlpatterns = [
 
     path("integrantes", views.integrantes, name="integrantes"),
     path("add-integrante/", views.addIntegrante, name="addIntegrante"),
-    path("del-integrante/<int:id_integrante>/", views.delIntegrante, name="delIntegrante"),
+    path("edit-integrante/<str:id_integrante>/", views.editIntegrante, name="editIntegrante"),
+    path("del-integrante/<str:id_integrante>/", views.delIntegrante, name="delIntegrante"),
     path("quem-somos/", views.quem_somos, name="quem_somos"),
 
     path("categoria-api/", views.categoriasAPI, name="categoriasAPI"),
     path("categoria-api/<int:id_categoria>/", views.categoriaAPI, name="categoriaAPI"),
+
     path("produtos/", views.produtos, name="produtos"),
-    path('minhas-pedidos/', views.minhas_pedidos, name="minhas_pedidos"),
-    path('relatorio/', views.relatorios, name='relatorio'),
+    path("minhas-pedidos/", views.minhas_pedidos, name="minhas_pedidos"),
+    path("relatorio/", views.relatorios, name="relatorio"),
 ]

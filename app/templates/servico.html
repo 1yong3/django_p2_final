@@ -1,101 +1,167 @@
-{% extends "template.html" %}
+{% extends 'template.html' %}
 
 {% block titulo %}
 Serviços
+{% endblock %}
 
 {% block conteudo %}
 
-{% if tem_servicos %}
-    <p>{{ total_servicos }} serviço(s) encontrado(s)</p>
-    {% if mais_barato %}
-        <p>Menor preço: R$ {{ mais_barato.preco }}</p>
-    {% endif %}
+<div style="max-width:1000px;margin:0 auto;padding:10px 20px 30px 20px;">
 
-    {% if mais_caro %}
-        <p>Maior preço: R$ {{ mais_caro.preco }}</p>
-    {% endif %}
+    <h2 style="color:#6b917b;margin-bottom:15px;">Serviços</h2>
 
-{% else %}
-    <p>Nenhum serviço encontrado.</p>
-{% endif %}
-
-<!-- Botão para alternar entre Lista e Cards -->
-<div style="margin: 20px 0; text-align: center;">
-    <button class="btn-toggle" onclick="toggleCards()" id="btnToggle">
-        {{ btn_texto|default:'Tabela' }}
-    </button>
-    <a href="{% url 'addServico' %}" style="display:inline-block;background:#6b917b;color:white;text-decoration:none;padding:10px 20px;border-radius:20px;font-size:0.9rem;font-weight:600;margin-left:10px;">Adicionar Serviço</a>
-</div>
-
-<!-- Tabela (padrão visível) -->
-<div id="tableSection" style="display: block;">
-    <table style="width: 80%; max-width: 900px; margin: 0 auto 30px auto; border-collapse: collapse; font-size: 0.9rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <thead>
-            <tr style="background: #6b917b; color: white;">
-                <th style="padding: 12px 15px; text-align: left;">Serviço</th>
-                <th style="padding: 12px 15px; text-align: left;">Descrição</th>
-                <th style="padding: 12px 15px; text-align: left;">Preço</th>
-                <th style="padding: 12px 15px; text-align: center;">Imagem</th>
-                <th style="padding: 12px 15px; text-align: center; width: 180px;">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for serv in servico %}
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 12px 15px;">{{ serv.nome }}</td>
-                <td style="padding: 12px 15px;">{{ serv.descricao }}</td>
-                <td style="padding: 12px 15px; font-weight: bold; color: #6b917b;">R$ {{ serv.preco }}</td>
-                <td style="padding: 12px 15px; text-align: center;"><img src="media/{{ serv.imagem }}" width="60px" alt="{{ serv.nome }}"></td>
-                <td style="padding: 12px 15px; text-align: center;">
-                    <a href="{% url 'editServico' serv.id %}" class="btn-action btn-edit">Editar</a>
-                    <a href="{% url 'delServico' serv.id %}" class="btn-action btn-delete">Excluir</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<!-- Seção de Cards (escondida inicialmente) -->
-<div class="card-section" id="cardsSection" style="margin-top: 20px; display: none;">
-    <h3 style="color: #6b917b; margin-bottom: 15px; text-align: center;">Serviços em Cards</h3>
-    <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
-        {% for serv in servico %}
-        <div class="card card-verde" style="width: 280px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div style="font-weight: bold; color: #6b917b; margin-bottom: 8px; font-size: 1.1rem;">{{ serv.nome }}</div>
-            <p style="font-size: 0.9rem; color: #555; line-height: 1.5;">{{ serv.descricao|truncatewords:15 }}</p>
-            <p style="font-weight: bold; color: #5a4761; font-size: 1rem; margin-top: 10px;">R$ {{ serv.preco }}</p>
+    <!-- Estatísticas -->
+    <div style="display:flex;flex-wrap:wrap;gap:15px;margin-bottom:22px;">
+        <div style="flex:1;min-width:150px;background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #6b917b;">
+            <div style="font-size:1.4rem;font-weight:700;color:#6b917b;">{{ total_servicos }}</div>
+            <div style="color:#666;font-size:0.85rem;">Serviços encontrados</div>
         </div>
-        {% empty %}
-        <p style="text-align: center; color: #888;">Nenhum serviço cadastrado.</p>
-        {% endfor %}
+        <div style="flex:1;min-width:150px;background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #234B35;">
+            <div style="font-size:1.4rem;font-weight:700;color:#234B35;">
+                {% if mais_barato %}R$ {{ mais_barato.preco }}{% else %}—{% endif %}
+            </div>
+            <div style="color:#666;font-size:0.85rem;">Menor preço</div>
+        </div>
+        <div style="flex:1;min-width:150px;background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #5a4761;">
+            <div style="font-size:1.4rem;font-weight:700;color:#5a4761;">
+                {% if mais_caro %}R$ {{ mais_caro.preco }}{% else %}—{% endif %}
+            </div>
+            <div style="color:#666;font-size:0.85rem;">Maior preço</div>
+        </div>
     </div>
+
+    <!-- Filtros -->
+    <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:22px;">
+        <form method="get" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+            <div style="flex:2;min-width:220px;">
+                <label style="display:block;font-size:0.85rem;color:#555;margin-bottom:5px;">Buscar por nome</label>
+                <input type="text" name="busca" value="{{ busca|default:'' }}" placeholder="Digite o nome do serviço"
+                       style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;">
+            </div>
+
+            <div style="flex:1;min-width:160px;">
+                <label style="display:block;font-size:0.85rem;color:#555;margin-bottom:5px;">Categoria</label>
+                <select name="categoria" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;">
+                    <option value="">Todas</option>
+                    {% for categoria_item in categorias %}
+                        <option value="{{ categoria_item.id }}"
+                            {% if categoria == categoria_item.id|stringformat:'s' %}selected{% endif %}>
+                            {{ categoria_item.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="flex:1;min-width:150px;">
+                <label style="display:block;font-size:0.85rem;color:#555;margin-bottom:5px;">Preço</label>
+                <select name="preco" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;">
+                    <option value="">Todos</option>
+                    <option value="baixo" {% if preco == 'baixo' %}selected{% endif %}>Até R$ 500</option>
+                    <option value="medio" {% if preco == 'medio' %}selected{% endif %}>R$ 500 a R$ 1500</option>
+                    <option value="alto" {% if preco == 'alto' %}selected{% endif %}>Acima de R$ 1500</option>
+                </select>
+            </div>
+
+            <div style="flex:1;min-width:150px;">
+                <label style="display:block;font-size:0.85rem;color:#555;margin-bottom:5px;">Ordenar por</label>
+                <select name="ordem" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;">
+                    <option value="nome" {% if ordem == 'nome' or not ordem %}selected{% endif %}>Nome</option>
+                    <option value="menor" {% if ordem == 'menor' %}selected{% endif %}>Menor preço</option>
+                    <option value="maior" {% if ordem == 'maior' %}selected{% endif %}>Maior preço</option>
+                </select>
+            </div>
+
+            <div style="display:flex;gap:8px;">
+                <button type="submit" class="btn-submit">Filtrar</button>
+                <a href="{% url 'servico' %}" class="btn-back" style="text-decoration:none;">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    {% if pode_gerenciar %}
+        <div style="margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="{% url 'addServico' %}" class="btn-submit" style="text-decoration:none;">+ Novo Serviço</a>
+            <button type="button" class="btn-toggle" onclick="toggleCards()" id="btnToggle">Tabela</button>
+        </div>
+    {% endif %}
+
+    {% if tem_servicos %}
+        <!-- Tabela -->
+        <div id="tableSection" style="display:block;">
+            <div style="overflow-x:auto;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+                <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+                    <thead>
+                        <tr style="background:#6b917b;color:#fff;">
+                            <th style="padding:12px 15px;text-align:left;">Serviço</th>
+                            <th style="padding:12px 15px;text-align:left;">Descrição</th>
+                            <th style="padding:12px 15px;text-align:left;">Preço</th>
+                            <th style="padding:12px 15px;text-align:center;">Imagem</th>
+                            {% if pode_gerenciar %}
+                                <th style="padding:12px 15px;text-align:center;width:170px;">Ações</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for serv in servico %}
+                            <tr style="border-bottom:1px solid #eee;">
+                                <td style="padding:12px 15px;font-weight:600;">{{ serv.nome }}</td>
+                                <td style="padding:12px 15px;color:#666;">{{ serv.descricao|truncatewords:14 }}</td>
+                                <td style="padding:12px 15px;font-weight:700;color:#6b917b;">R$ {{ serv.preco }}</td>
+                                <td style="padding:12px 15px;text-align:center;">
+                                    {% if serv.imagem %}
+                                        <img src="{{ serv.imagem.url }}" width="55" height="55" alt="{{ serv.nome }}"
+                                             style="object-fit:cover;border-radius:6px;">
+                                    {% else %}
+                                        <span style="color:#bbb;">—</span>
+                                    {% endif %}
+                                </td>
+                                {% if pode_gerenciar %}
+                                    <td style="padding:12px 15px;text-align:center;white-space:nowrap;">
+                                        <a href="{% url 'editServico' serv.id %}" class="btn-action btn-edit">Editar</a>
+                                        <a href="{% url 'delServico' serv.id %}" class="btn-action btn-delete"
+                                           onclick="return confirm('Deseja realmente excluir este serviço?');">Excluir</a>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cards -->
+        <div id="cardsSection" style="display:none;">
+            <div style="display:flex;flex-wrap:wrap;gap:18px;justify-content:center;">
+                {% for serv in servico %}
+                    <div class="card card-verde" style="width:280px;padding:20px;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+                        {% if serv.imagem %}
+                            <img src="{{ serv.imagem.url }}" alt="{{ serv.nome }}"
+                                 style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+                        {% endif %}
+                        <div style="font-weight:700;color:#6b917b;margin-bottom:8px;font-size:1.05rem;">{{ serv.nome }}</div>
+                        <p style="font-size:0.88rem;color:#666;line-height:1.5;">{{ serv.descricao|truncatewords:18 }}</p>
+                        <p style="font-weight:700;color:#5a4761;margin-top:10px;">R$ {{ serv.preco }}</p>
+
+                        {% if pode_gerenciar %}
+                            <div style="margin-top:12px;">
+                                <a href="{% url 'editServico' serv.id %}" class="btn-action btn-edit">Editar</a>
+                                <a href="{% url 'delServico' serv.id %}" class="btn-action btn-delete"
+                                   onclick="return confirm('Deseja realmente excluir este serviço?');">Excluir</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div style="background:#fff;border-radius:12px;padding:25px;color:#888;text-align:center;">
+            Nenhum serviço encontrado com os filtros selecionados.
+        </div>
+    {% endif %}
+
+    <p style="margin-top:25px;">
+        <a href="{% url 'dashboard' %}" class="btn-back" style="text-decoration:none;">Voltar ao Dashboard</a>
+    </p>
 </div>
 
-<h3>Buscar Serviço</h3>
-
-<form method="GET" style="margin: 20px 0; font-size: 0.9rem; text-align: center;">
-    <input type="text" name="busca" placeholder="Digite o nome do serviço" value="{{busca|default:''}}" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px 0 0 20px; width: 300px;">
-    <button type="submit" style="padding: 10px 20px; background: #5a4761; color: white; border: none; border-radius: 0 20px 20px 0; cursor: pointer;">Buscar</button>
-</form>
-
-<h3>Filtrar por Categoria</h3>
-<div style="text-align: center; margin: 15px 0;">
-{% for categoria_item in categorias %}
-    <a href="?categoria={{ categoria_item.id}}" style="margin: 5px;">
-        <button style="padding: 8px 15px; background: #6b917b; color: white; border: none; border-radius: 20px; font-size: 0.85rem; cursor: pointer;">{{ categoria_item.nome }}</button>
-    </a>
-{% endfor %}
-</div>
-
-<h3>Ordenar</h3>
-<div style="text-align: center; margin: 15px 0;">
-    <a href="?ordem=menor"><button style="padding: 8px 15px; background: #5a4761; color: white; border: none; border-radius: 20px; margin: 5px; font-size: 0.85rem; cursor: pointer;">Menor Preço</button></a>
-    <a href="?ordem=maior"><button style="padding: 8px 15px; background: #5a4761; color: white; border: none; border-radius: 20px; margin: 5px; font-size: 0.85rem; cursor: pointer;">Maior Preço</button></a>
-    <a href="?ordem=nome"><button style="padding: 8px 15px; background: #5a4761; color: white; border: none; border-radius: 20px; margin: 5px; font-size: 0.85rem; cursor: pointer;">Nome</button></a>
-    <br><br>
-    <a href="{%url 'servico' %}"><button style="padding: 8px 15px; background: #666; color: white; border: none; border-radius: 20px; margin: 5px; font-size: 0.85rem; cursor: pointer;">Limpar Filtros</button></a>
-</div>
-
-{% endblock %}
 {% endblock %}

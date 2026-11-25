@@ -1,4 +1,4 @@
-{% extends "template.html" %}
+{% extends 'template.html' %}
 
 {% block titulo %}
 Relatórios
@@ -6,14 +6,54 @@ Relatórios
 
 {% block conteudo %}
 
-<h1>Relatório</h1>
+<div style="max-width:1000px;margin:0 auto;padding:10px 20px 30px 20px;">
 
-<div style="width: 500px; max-width: 100%; height: 250px; margin-bottom: 30px;">
-    <canvas id="graficoCategorias"></canvas>
-</div>
+    <h2 style="color:#6b917b;margin-bottom:18px;">Relatórios</h2>
 
-<div style="width: 350px; max-width: 100%; height: 250px;">
-    <canvas id="graficoStatus"></canvas>
+    <!-- Indicadores -->
+    <div style="display:flex;flex-wrap:wrap;gap:15px;margin-bottom:25px;">
+        <div style="flex:1;min-width:150px;background:#fff;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #6b917b;">
+            <div style="font-size:1.5rem;font-weight:700;color:#6b917b;">{{ total_servicos }}</div>
+            <div style="color:#666;font-size:0.85rem;">Total de serviços</div>
+        </div>
+        <div style="flex:1;min-width:150px;background:#fff;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #234B35;">
+            <div style="font-size:1.5rem;font-weight:700;color:#234B35;">{{ servicos_ativos }}</div>
+            <div style="color:#666;font-size:0.85rem;">Ativos</div>
+        </div>
+        <div style="flex:1;min-width:150px;background:#fff;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #5a4761;">
+            <div style="font-size:1.5rem;font-weight:700;color:#5a4761;">{{ servicos_inativos }}</div>
+            <div style="color:#666;font-size:0.85rem;">Inativos</div>
+        </div>
+        <div style="flex:1;min-width:150px;background:#fff;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #6b917b;">
+            <div style="font-size:1.5rem;font-weight:700;color:#6b917b;">R$ {{ preco_medio|floatformat:2 }}</div>
+            <div style="color:#666;font-size:0.85rem;">Preço médio</div>
+        </div>
+        <div style="flex:1;min-width:150px;background:#fff;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #234B35;">
+            <div style="font-size:1.5rem;font-weight:700;color:#234B35;">{{ total_pedidos }}</div>
+            <div style="color:#666;font-size:0.85rem;">Pedidos realizados</div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div style="display:flex;flex-wrap:wrap;gap:20px;">
+        <div style="flex:2;min-width:300px;background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+            <h3 style="color:#234B35;margin-bottom:12px;font-size:1rem;">Serviços por categoria</h3>
+            <div style="height:260px;">
+                <canvas id="graficoCategorias"></canvas>
+            </div>
+        </div>
+
+        <div style="flex:1;min-width:260px;background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+            <h3 style="color:#234B35;margin-bottom:12px;font-size:1rem;">Ativos x Inativos</h3>
+            <div style="height:260px;">
+                <canvas id="graficoStatus"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <p style="margin-top:25px;">
+        <a href="{% url 'dashboard' %}" class="btn-back" style="text-decoration:none;">Voltar ao Dashboard</a>
+    </p>
 </div>
 
 {{ categorias_labels|json_script:"categorias" }}
@@ -22,23 +62,25 @@ Relatórios
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const categorias = JSON.parse(
-        document.getElementById('categorias').textContent
-    );
-
-    const quantidades = JSON.parse(
-        document.getElementById('quantidades').textContent
-    );
+    const categorias = JSON.parse(document.getElementById('categorias').textContent);
+    const quantidades = JSON.parse(document.getElementById('quantidades').textContent);
 
     new Chart(document.getElementById('graficoCategorias'), {
         type: 'bar',
         data: {
-            labels: categorias,
+            labels: categorias.length ? categorias : ['Sem dados'],
             datasets: [{
                 label: 'Serviços por categoria',
-                data: quantidades,
-                backgroundColor: '#234B35'
+                data: quantidades.length ? quantidades : [0],
+                backgroundColor: '#6b917b',
+                borderRadius: 6
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
         }
     });
 
@@ -47,18 +89,15 @@ Relatórios
         data: {
             labels: ['Ativos', 'Inativos'],
             datasets: [{
-                data: [
-                    {{ servicos_ativos }},
-                    {{ servicos_inativos }}
-                ],
-                backgroundColor: [
-                    '#234B35',
-                    '#542C72',
-                ]
+                data: [{{ servicos_ativos }}, {{ servicos_inativos }}],
+                backgroundColor: ['#6b917b', '#5a4761']
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 </script>
-
 
 {% endblock %}

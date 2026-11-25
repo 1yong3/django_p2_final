@@ -1,17 +1,23 @@
 {% extends 'template.html' %}
 
 {% block titulo %}
-Dashboard
+Alterar Senha
 {% endblock %}
 
 {% block conteudo %}
 
-    <h2> Alterar Senha </h2>
+<div class="form-container" style="max-width:520px;">
+    <h2>Alterar Senha</h2>
+
     <form method="post">
         {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Alterar Senha">
-        
+        {{ form.as_p }}
+
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">Alterar Senha</button>
+            <a href="{% url 'perfil' %}" class="btn-back">Voltar</a>
+        </div>
     </form>
+</div>
 
 {% endblock %}

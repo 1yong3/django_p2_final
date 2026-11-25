@@ -1,18 +1,24 @@
 {% extends 'template.html' %}
 
 {% block titulo %}
-Dashboard
+Criar Conta
 {% endblock %}
 
 {% block conteudo %}
-    <h2> Criar Conta </h2>
 
-    <form method = "POST">
+<div class="form-container" style="max-width:520px;">
+    <h2>Criar Conta</h2>
+
+    <form method="post">
         {% csrf_token %}
 
-        {{form}}
+        {{ form.as_p }}
 
-        <button type="submit">Cadastrar</button>
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">Cadastrar</button>
+            <a href="{% url 'login' %}" class="btn-back">Voltar</a>
+        </div>
     </form>
-    
+</div>
+
 {% endblock %}

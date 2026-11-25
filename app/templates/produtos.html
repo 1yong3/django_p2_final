@@ -6,46 +6,65 @@ Produtos
 
 {% block conteudo %}
 
-<h2>Produtos</h2>
+<div style="max-width:1100px; margin:0 auto; padding:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <h2 style="color:#6b917b;">Produtos</h2>
+        {% if user.is_authenticated %}
+            <a href="{% url 'minhas_pedidos' %}"
+               style="background:#5a4761;color:#fff;padding:10px 18px;border-radius:20px;text-decoration:none;">
+                Meus Pedidos
+            </a>
+        {% endif %}
+    </div>
 
-<!-- Produtos Locais -->
-<h3>Produtos Locais</h3>
-<div class="local-products" style="display:flex; flex-wrap:wrap; gap:15px;">
-    {% for serv in servicos %}
-        <div class="product-card" style="width:240px; padding:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-radius:8px;">
-            {% if serv.imagem %}
-                <img src="{{ serv.imagem.url }}" alt="{{ serv.nome }}" width="100px" style="display:block; margin:0 auto; object-fit:cover; border-radius:8px;">
-            {% endif %}
-            <h3>{{ serv.nome }}</h3>
-            <p>R$ {{ serv.preco }}</p>
-            {% if user.is_authenticated %}
-                <form method="post" action="{% url 'produtos' %}" style="margin-top:10px;">
-                    {% csrf_token %}
-                    <input type="hidden" name="servico_id" value="{{ serv.id }}">
-                    <button type="submit" name="comprar" style="background:#28a745;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;">Comprar</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" style="display:inline-block;background:#6c757d;color:white;padding:8px 16px;border-radius:4px;text-decoration:none;">Login para comprar</a>
-            {% endif %}
-        </div>
-    {% empty %}
-        <p>Nenhum serviço cadastrado.</p>
-    {% endfor %}
-</div>
+    <!-- Produtos Locais -->
+    <h3 style="color:#234B35; margin-top:25px;">Produtos Locais</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:18px;">
+        {% for serv in servicos %}
+            <div style="width:240px; background:#fff; padding:16px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.08); text-align:center;">
+                {% if serv.imagem %}
+                    <img src="{{ serv.imagem.url }}" alt="{{ serv.nome }}"
+                         style="width:120px;height:120px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+                {% endif %}
+                <h3 style="margin:8px 0;color:#333;">{{ serv.nome }}</h3>
+                <p style="color:#6b917b;font-weight:700;">R$ {{ serv.preco }}</p>
 
-<!-- Produtos da API Externa -->
-<h3>Produtos da API Externa</h3>
-<div class="api-products" style="display:flex; flex-wrap:wrap; gap:15px;">
-    {% for prod in produtos_api %}
-        <div class="product-card" style="width:240px; padding:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-radius:8px;">
-            <img src="{{ prod.image }}" alt="{{ prod.title }}" width="100px" style="display:block; margin:0 auto; object-fit:cover; border-radius:8px;">
-            <h3>{{ prod.title }}</h3>
-            <p style="font-size:0.85rem;color:#555;">{{ prod.description|truncatewords:20 }}</p>
-            <p>R$ {{ prod.price }}</p>
-        </div>
-    {% empty %}
-        <p>Nenhum produto encontrado na API.</p>
-    {% endfor %}
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'produtos' %}" style="margin-top:10px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="servico_id" value="{{ serv.id }}">
+                        <button type="submit" name="comprar"
+                                style="background:#28a745;color:#fff;border:none;padding:9px 18px;border-radius:20px;cursor:pointer;font-weight:600;">
+                            Comprar
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'produtos' %}"
+                       style="display:inline-block;background:#6c757d;color:#fff;padding:9px 18px;border-radius:20px;text-decoration:none;font-weight:600;">
+                        Entrar para comprar
+                    </a>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p style="color:#888;">Nenhum produto local cadastrado.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Produtos da API Externa -->
+    <h3 style="color:#234B35; margin-top:35px;">Produtos da API Externa</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:18px;">
+        {% for prod in produtos_api %}
+            <div style="width:240px; background:#fff; padding:16px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.08); text-align:center;">
+                <img src="{{ prod.image }}" alt="{{ prod.title }}"
+                     style="width:120px;height:120px;object-fit:contain;margin-bottom:10px;">
+                <h3 style="margin:8px 0;color:#333;font-size:1rem;">{{ prod.title }}</h3>
+                <p style="color:#666;font-size:0.85rem;">{{ prod.description|truncatewords:18 }}</p>
+                <p style="color:#5a4761;font-weight:700;">R$ {{ prod.price }}</p>
+            </div>
+        {% empty %}
+            <p style="color:#888;">Nenhum produto encontrado na API externa.</p>
+        {% endfor %}
+    </div>
 </div>
 
 {% endblock %}

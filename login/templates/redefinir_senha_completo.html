@@ -1,0 +1,23 @@
+{% extends 'template.html' %}
+
+{% block titulo %}
+Senha redefinida
+{% endblock %}
+
+{% block conteudo %}
+
+<div style="max-width:600px;margin:40px auto;padding:0 20px;text-align:center;">
+    <h2 style="color:#6b917b;margin-bottom:15px;">Senha redefinida com sucesso</h2>
+
+    <p style="color:#555;line-height:1.7;">
+        Sua nova senha já está ativa. Faça login para continuar.
+    </p>
+
+    <p style="margin-top:25px;">
+        <a href="{% url 'login' %}" class="btn-submit" style="text-decoration:none;display:inline-block;">
+            Ir para o login
+        </a>
+    </p>
+</div>
+
+{% endblock %}

@@ -162,6 +162,10 @@ STATIC_URL = '/static/'
 # Pasta onde o collectstatic reunirá os arquivos
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Permite que o WhiteNoise encontre arquivos estáticos nos app dirs mesmo
+# quando o collectstatic não for executado no build.
+WHITENOISE_USE_FINDERS = True
+
 # =====================================================
 # ARQUIVOS DE MÍDIA
 # =====================================================
