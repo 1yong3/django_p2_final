@@ -362,66 +362,118 @@ def _recalcular_total(pedido):
     pedido.save(update_fields=['total'])
 
 
-def _normalizar_fakestore(dados):
-    """Converte a resposta da Fake Store API no formato usado pelo template."""
-    if not isinstance(dados, list):
-        return []
-
-    return [
-        {
-            'title': item.get('title', ''),
-            'description': item.get('description', ''),
-            'price': item.get('price', ''),
-            'image': item.get('image', ''),
-        }
-        for item in dados
-        if isinstance(item, dict)
-    ]
+def _capa_openlibrary(cover_id):
+    """Monta a URL da capa do livro na Open Library."""
+    if not cover_id:
+        return ''
+    return f'https://covers.openlibrary.org/b/id/{cover_id}-M.jpg'
 
 
-def _normalizar_dummyjson(dados):
-    """Converte a resposta da DummyJSON no formato usado pelo template."""
+def _normalizar_livro(dados, autores, ano, capa, chave):
+    """Converte um livro da Open Library no formato usado pelo template."""
+    titulo = (dados.get('title') or '').strip()
+    if not titulo:
+        return None
+
+    if isinstance(autores, list):
+        autores = [a for a in autores if isinstance(a, str) and a.strip()]
+    elif isinstance(autores, dict):
+        autores = [a.get('name', '') for a in autores.values()
+                   if isinstance(a, dict) and a.get('name')]
+    else:
+        autores = []
+
+    return {
+        'title': titulo,
+        'description': ', '.join(autores) or 'Autor não informado',
+        'ano': ano or '',
+        'price': 'Preço não informado',
+        'image': capa,
+        'url': f'https://openlibrary.org{chave}' if chave else (
+            'https://openlibrary.org/'
+        ),
+    }
+
+
+def _normalizar_busca_openlibrary(dados):
+    """Formato de /search.json: docs com author_name e cover_i."""
     if not isinstance(dados, dict):
         return []
 
-    itens = dados.get('products', [])
-    if not isinstance(itens, list):
+    documentos = dados.get('docs', [])
+    if not isinstance(documentos, list):
         return []
 
-    produtos = []
-    for item in itens:
+    livros = []
+    for item in documentos:
         if not isinstance(item, dict):
             continue
 
-        imagens = item.get('images') or []
-        imagem = item.get('thumbnail') or (imagens[0] if imagens else '')
+        livro = _normalizar_livro(
+            item,
+            item.get('author_name'),
+            item.get('first_publish_year'),
+            _capa_openlibrary(item.get('cover_i')),
+            item.get('key'),
+        )
+        if livro:
+            livros.append(livro)
 
-        produtos.append({
-            'title': item.get('title', ''),
-            'description': item.get('description', ''),
-            'price': item.get('price', ''),
-            'image': imagem,
-        })
-
-    return produtos
+    return livros
 
 
-# API externa usada na página de produtos. A primeira que responder com JSON
-# válido é utilizada; se todas falharem, a página continua funcionando sem os
-# produtos externos (evita JSONDecodeError/500).
-FONTES_PRODUTOS_API = (
-    ('https://fakestoreapi.com/products', _normalizar_fakestore),
-    ('https://dummyjson.com/products?limit=4', _normalizar_dummyjson),
+def _normalizar_subject_openlibrary(dados):
+    """Formato alternativo de /subjects/....json (usado como reserva)."""
+    if not isinstance(dados, dict):
+        return []
+
+    obras = dados.get('works', [])
+    if not isinstance(obras, list):
+        return []
+
+    livros = []
+    for item in obras:
+        if not isinstance(item, dict):
+            continue
+
+        livro = _normalizar_livro(
+            item,
+            [a.get('name', '') for a in (item.get('authors') or [])
+             if isinstance(a, dict)],
+            item.get('first_publish_year'),
+            _capa_openlibrary(item.get('cover_id')),
+            item.get('key'),
+        )
+        if livro:
+            livros.append(livro)
+
+    return livros
+
+
+# API externa usada na página de produtos: Open Library (livros, sem chave).
+# A primeira fonte que responder com JSON válido é usada; se ambas falharem,
+# a página continua funcionando apenas com os produtos locais.
+FONTES_LIVROS_API = (
+    (
+        'https://openlibrary.org/search.json'
+        '?q=programacao&limit=4&fields=key,title,author_name,cover_i,'
+        'first_publish_year',
+        _normalizar_busca_openlibrary,
+    ),
+    (
+        'https://openlibrary.org/subjects/programming.json?limit=4',
+        _normalizar_subject_openlibrary,
+    ),
 )
 
 
-def _buscar_produtos_api(limite=4):
+def _buscar_livros_api(limite=4):
     headers = {
         'User-Agent': 'Mozilla/5.0 (compatible; MindPalace/1.0)',
         'Accept': 'application/json',
     }
 
-    for url, normalizar in FONTES_PRODUTOS_API:
+    for url, normalizar in FONTES_LIVROS_API:
         try:
             resposta = requests.get(url, timeout=8, headers=headers)
             resposta.raise_for_status()
@@ -434,16 +486,16 @@ def _buscar_produtos_api(limite=4):
         except (requests.RequestException, ValueError):
             continue
 
-        produtos = normalizar(dados)
-        if produtos:
-            return produtos[:limite]
+        livros = normalizar(dados)
+        if livros:
+            return livros[:limite]
 
     return []
 
 
 def produtos(request):
     servicos = Servico.objects.filter(ativo=True)
-    produtos_api = _buscar_produtos_api()
+    livros_api = _buscar_livros_api()
 
     if request.method == 'POST' and 'comprar' in request.POST:
         if not request.user.is_authenticated:
@@ -478,7 +530,7 @@ def produtos(request):
     return render(request, 'produtos.html', {
         'servicos': servicos,
         'produtos': servicos,
-        'produtos_api': produtos_api,
+        'livros_api': livros_api,
     })
 
 

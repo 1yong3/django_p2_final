@@ -1,7 +1,7 @@
 # Mind Palace — Projeto Final WEB III (Django)
 
 Sistema web desenvolvido em Django atendendo aos requisitos do projeto final:
-Home, Quem Somos (Supabase), Produtos (banco local + API externa), Contato,
+Home, Quem Somos (Supabase), Produtos (banco local + API externa de livros), Contato,
 login com perfis, recuperação de senha, dashboard por permissões, CRUD de
 serviços, CRUD de equipe (Supabase), meus pedidos e relatórios com gráficos.
 
@@ -41,7 +41,7 @@ Acesse `http://127.0.0.1:8000/`.
 |---|---|
 | Home | Menu com Quem Somos, Produtos, Contato e Entrar |
 | Quem Somos | Texto institucional + integrantes consultados no Supabase |
-| Produtos | Produtos locais (com botão **Comprar** apenas para logados) e produtos da API externa (Fake Store API) |
+| Produtos | Produtos locais (com botão **Comprar** apenas para logados) e 4 livros da API externa (Open Library) |
 | Contato | Formulário público de contato |
 | Entrar | Login, recuperação de senha e cadastro |
 | Dashboard | Menu conforme permissão: Editar Perfil, Contatos, Serviços, Equipe, Meus Pedidos e Relatórios |
