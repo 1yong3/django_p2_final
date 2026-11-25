@@ -56,6 +56,7 @@ main{max-width:1200px;margin:20px auto;padding:0 20px}
 .auth-wrap{max-width:980px;margin:35px auto;padding:0 20px}
 .auth-card{display:flex;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 18px 50px rgba(35,75,53,0.18)}
 .auth-side{flex:1;min-width:280px;background:linear-gradient(150deg,#6b917b 0%,#234B35 55%,#5a4761 145%);color:#fff;padding:44px 36px;display:flex;flex-direction:column;justify-content:center}
+.auth-side-badge{align-self:flex-start;display:inline-flex;align-items:center;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:#fff;padding:6px 16px;border-radius:999px;font-size:0.72rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:18px}
 .auth-logo{width:64px;height:64px;object-fit:contain;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);border-radius:16px;padding:8px;margin-bottom:16px}
 .auth-brand{display:block;font-size:0.78rem;letter-spacing:2px;text-transform:uppercase;opacity:0.85;margin-bottom:10px}
 .auth-side-title{font-size:1.9rem;line-height:1.2;margin-bottom:14px}
