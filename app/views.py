@@ -3,7 +3,7 @@ from decimal import Decimal
 import requests
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Max
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from login.decorators import admin_required, is_admin
 
 from .forms import FormServico
-from .models import Categoria, ItemPedido, Pedido, Servico
+from .models import Categoria, Integrante, ItemPedido, Pedido, Servico
 from .serializers import CategoriaSerializer
 from .supabase_client import supabase
 
@@ -134,16 +134,46 @@ ORDEM_CARGOS_QUEM_SOMOS = {
 
 
 def _ordenar_integrantes(integrantes):
+    # A ordem definida no admin (campo "ordem") tem prioridade. Quem não estiver
+    # cadastrado no admin é ordenado pelos cargos: Desenvolvedor, Criador, Tester.
+    try:
+        ordens = {
+            (i.nome or '').strip().lower(): i.ordem
+            for i in Integrante.objects.filter(ativo=True)
+        }
+    except Exception:
+        ordens = {}
+
     return sorted(
         integrantes,
         key=lambda item: (
-            ORDEM_CARGOS_QUEM_SOMOS.get(
-                (item.get('cargo') or '').strip().lower(),
-                99,
+            ordens.get(
+                (item.get('nome') or '').strip().lower(),
+                100 + ORDEM_CARGOS_QUEM_SOMOS.get(
+                    (item.get('cargo') or '').strip().lower(),
+                    99,
+                ),
             ),
             str(item.get('nome') or '').lower(),
         ),
     )
+
+
+def _integrantes_locais():
+    """Equipe cadastrada no Django admin (usada como fallback do Supabase)."""
+    try:
+        return [
+            {
+                'id': i.pk,
+                'nome': i.nome,
+                'cargo': i.cargo,
+                'biografia': i.biografia,
+                'foto_url': i.foto_url,
+            }
+            for i in Integrante.objects.filter(ativo=True)
+        ]
+    except Exception:
+        return []
 
 
 # Equipe exibida em "Quem Somos" quando o Supabase está indisponível/sem dados.
@@ -192,13 +222,59 @@ def integrantes(request):
 def quem_somos(request):
     integrantes = _ordenar_integrantes(_buscar_integrantes())
 
-    # Nunca deixa a página vazia: se o Supabase falhar, usa a equipe local.
+    # Se o Supabase falhar, usa a equipe cadastrada no Django admin; se o
+    # admin também estiver vazio, usa a equipe padrão do projeto.
+    if not integrantes:
+        integrantes = _ordenar_integrantes(_integrantes_locais())
     if not integrantes:
         integrantes = _ordenar_integrantes(EQUIPE_PADRAO)
 
     return render(request, 'quem_somos.html', {
         'integrantes': integrantes,
     })
+
+
+def _sincronizar_integrante_local(
+    nome, cargo, biografia, foto_url, nome_anterior=None
+):
+    """Espelha no admin o integrante alterado pelo CRUD do dashboard.
+
+    Usa update()/bulk_create() de propósito: eles não disparam os sinais que
+    escrevem no Supabase, evitando um ciclo de sincronização.
+    """
+    try:
+        atualizados = Integrante.objects.filter(
+            nome=nome_anterior or nome
+        ).update(
+            nome=nome,
+            cargo=cargo,
+            biografia=biografia,
+            foto_url=foto_url,
+        )
+
+        if not atualizados:
+            proxima_ordem = (
+                Integrante.objects.aggregate(Max('ordem'))['ordem__max'] or 0
+            ) + 1
+            Integrante.objects.bulk_create([
+                Integrante(
+                    nome=nome,
+                    cargo=cargo,
+                    biografia=biografia,
+                    foto_url=foto_url,
+                    ordem=proxima_ordem,
+                    ativo=True,
+                )
+            ])
+    except Exception:
+        pass
+
+
+def _remover_integrante_local(nome):
+    try:
+        Integrante.objects.filter(nome=nome).delete()
+    except Exception:
+        pass
 
 
 @admin_required
@@ -209,12 +285,14 @@ def addIntegrante(request):
             return redirect('integrantes')
 
         try:
-            supabase.table('integrantes').insert({
+            dados = {
                 'nome': request.POST.get('nome'),
                 'cargo': request.POST.get('cargo'),
                 'biografia': request.POST.get('biografia'),
                 'foto_url': request.POST.get('foto'),
-            }).execute()
+            }
+            supabase.table('integrantes').insert(dados).execute()
+            _sincronizar_integrante_local(**dados)
             messages.success(request, 'Integrante cadastrado com sucesso.')
         except Exception:
             messages.error(request, 'Não foi possível cadastrar o integrante.')
@@ -232,12 +310,28 @@ def editIntegrante(request, id_integrante):
 
     if request.method == 'POST':
         try:
-            supabase.table('integrantes').update({
+            anteriores = (
+                supabase.table('integrantes')
+                .select('nome')
+                .eq('id', id_integrante)
+                .execute()
+                .data
+            )
+            nome_anterior = anteriores[0]['nome'] if anteriores else None
+
+            dados = {
                 'nome': request.POST.get('nome'),
                 'cargo': request.POST.get('cargo'),
                 'biografia': request.POST.get('biografia'),
                 'foto_url': request.POST.get('foto'),
-            }).eq('id', id_integrante).execute()
+            }
+            supabase.table('integrantes').update(dados).eq(
+                'id', id_integrante
+            ).execute()
+            _sincronizar_integrante_local(
+                nome_anterior=nome_anterior,
+                **dados,
+            )
             messages.success(request, 'Integrante atualizado com sucesso.')
         except Exception:
             messages.error(request, 'Não foi possível atualizar o integrante.')
@@ -264,9 +358,20 @@ def editIntegrante(request, id_integrante):
 def delIntegrante(request, id_integrante):
     if supabase is not None:
         try:
+            anteriores = (
+                supabase.table('integrantes')
+                .select('nome')
+                .eq('id', id_integrante)
+                .execute()
+                .data
+            )
+            nome = anteriores[0]['nome'] if anteriores else None
+
             supabase.table('integrantes').delete().eq(
                 'id', id_integrante
             ).execute()
+            if nome:
+                _remover_integrante_local(nome)
             messages.success(request, 'Integrante excluído com sucesso.')
         except Exception:
             messages.error(request, 'Não foi possível excluir o integrante.')

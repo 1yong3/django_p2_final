@@ -56,7 +56,7 @@ Acesse `http://127.0.0.1:8000/`.
   ao logar é redirecionado para `/admin/`.
 - **Cliente**: ao logar é redirecionado para `/login/dashboard/`.
 
-## Gerenciar produtos pelo Django admin
+## Gerenciar produtos e equipe pelo Django admin
 
 Todos os produtos exibidos em `/produtos/` vêm do modelo `app.Servico` e são
 administrados em:
@@ -81,6 +81,24 @@ permite editar preço e status diretamente na listagem.
 > logins sobrevivam a deploys. Imagens enviadas pelo admin ficam em `media/`,
 > que é efêmero no Render; arquivos versionados em `media/servicos/` funcionam
 > normalmente após o deploy.
+
+### Quem Somos no admin
+
+A equipe também pode ser editada em:
+
+```
+/admin/  →  Loja (Produtos)  →  Quem Somos (Equipe)
+```
+
+- Cada integrante tem nome, cargo (Criador, Desenvolvedor, Tester), biografia,
+  `foto_url` (ex.: `/media/servicos/ic_quemsomos1.png`), **ordem** e **Ativo**.
+- A ordem `1, 2, 3` controla a posição na página; coloque o **Criador** na
+  posição `2` para ele ficar no centro.
+- Ao salvar ou excluir no admin, os dados são enviados **automaticamente ao
+  Supabase** (`app/signals.py`). A página `/quem-somos/` lê do Supabase e usa
+  o cadastro local como fallback se ele estiver fora do ar.
+- O CRUD de **Equipe** do dashboard também sincroniza de volta para o admin,
+  para as duas telas não divergirem.
 
 ## Supabase
 

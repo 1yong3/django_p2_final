@@ -1,12 +1,52 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Categoria, ItemPedido, Pedido, Servico
+from .models import Categoria, Integrante, ItemPedido, Pedido, Servico
 
 
 admin.site.site_header = 'Mind Palace — Administração'
 admin.site.site_title = 'Mind Palace'
 admin.site.index_title = 'Gerenciamento do site'
+
+
+@admin.register(Integrante)
+class IntegranteAdmin(admin.ModelAdmin):
+    list_display = ['ordem', 'nome', 'cargo', 'foto_preview', 'ativo']
+    list_display_links = ['nome']
+    list_editable = ['ordem', 'ativo']
+    list_filter = ['cargo', 'ativo']
+    search_fields = ['nome', 'cargo', 'biografia']
+    list_per_page = 20
+
+    fieldsets = (
+        ('Pessoa', {
+            'fields': ('nome', 'cargo', 'biografia'),
+            'description': (
+                'Esses dados aparecem na página /quem-somos/ do site.'
+            ),
+        }),
+        ('Foto e ordem', {
+            'fields': ('foto_url', 'ordem', 'ativo'),
+            'description': (
+                'Use um caminho como /media/servicos/ic_quemsomos1.png. '
+                'A ordem 1, 2, 3 exibe as pessoas da esquerda para a direita; '
+                'coloque o Criador na posição 2 para ficar no centro. '
+                'Ao salvar, os dados são enviados automaticamente ao Supabase.'
+            ),
+        }),
+    )
+
+    @admin.display(description='Foto')
+    def foto_preview(self, obj):
+        if not obj.foto_url:
+            return '—'
+
+        return format_html(
+            '<img src="{}" alt="{}" style="height:38px;width:38px;'
+            'object-fit:contain;border-radius:50%;background:#eef3f0;">',
+            obj.foto_url,
+            obj.nome,
+        )
 
 
 @admin.action(description='Ativar selecionados (mostrar no site)')

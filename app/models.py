@@ -2,6 +2,39 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class Integrante(models.Model):
+    """Equipe do Quem Somos, editável no Django admin e sincronizada ao Supabase."""
+
+    CARGOS = [
+        ('Criador', 'Criador'),
+        ('Desenvolvedor', 'Desenvolvedor'),
+        ('Tester', 'Tester'),
+        ('Outro', 'Outro'),
+    ]
+
+    nome = models.CharField(max_length=100)
+    cargo = models.CharField(max_length=30, choices=CARGOS, default='Outro')
+    biografia = models.TextField(blank=True)
+    foto_url = models.CharField(
+        max_length=300,
+        blank=True,
+        help_text='URL ou caminho local, ex.: /media/servicos/ic_quemsomos1.png',
+    )
+    ordem = models.PositiveIntegerField(
+        default=0,
+        help_text='Menor número aparece primeiro (use 2 para o Criador ficar no centro).',
+    )
+    ativo = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = 'Integrante'
+        verbose_name_plural = 'Quem Somos (Equipe)'
+        ordering = ['ordem', 'nome']
+
+    def __str__(self):
+        return f'{self.nome} — {self.cargo}'
+
+
 class Categoria(models.Model):
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
