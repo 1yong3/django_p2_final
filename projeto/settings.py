@@ -1,4 +1,3 @@
-
 """
 Django settings for projeto project.
 Configuração para desenvolvimento local e produção no Render.
@@ -223,4 +222,3 @@ def get_role_based_redirect(user):
 # =====================================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
