@@ -1,24 +1,67 @@
-{% extends 'template.html' %}
+{% extends 'auth_base.html' %}
 
-{% block titulo %}
-Criar Conta
+{% block titulo %}Criar Conta{% endblock %}
+
+{% block auth_heading %}Comece agora mesmo{% endblock %}
+
+{% block auth_text %}
+    Crie sua conta gratuitamente e tenha acesso ao catálogo de produtos,
+    pedidos e todas as áreas do sistema.
 {% endblock %}
 
-{% block conteudo %}
+{% block auth_body %}
+    <h2 class="auth-title">Criar conta</h2>
+    <p class="auth-subtitle">Preencha os dados abaixo para se cadastrar.</p>
 
-<div class="form-container" style="max-width:520px;">
-    <h2>Criar Conta</h2>
-
-    <form method="post">
+    <form method="post" class="auth-form">
         {% csrf_token %}
 
-        {{ form.as_p }}
+        {% if form.non_field_errors %}
+            <div class="auth-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
 
-        <div class="form-actions">
-            <button type="submit" class="btn-submit">Cadastrar</button>
-            <a href="{% url 'login' %}" class="btn-back">Voltar</a>
+        <div class="auth-field">
+            <label for="id_username">Nome de usuário</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="auth-errors">{{ form.username.errors }}</div>
+            {% endif %}
+            {% if form.username.help_text %}
+                <p class="auth-help">{{ form.username.help_text }}</p>
+            {% endif %}
         </div>
-    </form>
-</div>
 
+        <div class="auth-field">
+            <label for="id_email">E-mail</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="auth-errors">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="auth-field">
+            <label for="id_password1">Senha</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div class="auth-errors">{{ form.password1.errors }}</div>
+            {% endif %}
+            {% if form.password1.help_text %}
+                <p class="auth-help">{{ form.password1.help_text }}</p>
+            {% endif %}
+        </div>
+
+        <div class="auth-field">
+            <label for="id_password2">Confirmar senha</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div class="auth-errors">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="auth-submit">Cadastrar</button>
+    </form>
+
+    <div class="auth-divider"><span>já tem uma conta?</span></div>
+
+    <a href="{% url 'login' %}" class="auth-alt-btn">Entrar</a>
 {% endblock %}

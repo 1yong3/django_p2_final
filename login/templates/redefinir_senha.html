@@ -1,19 +1,44 @@
-{% extends "template.html" %}
+{% extends 'auth_base.html' %}
 
-{% block titulo %}
-Redefinir Senha
+{% block titulo %}Redefinir Senha{% endblock %}
+
+{% block auth_heading %}Crie uma nova senha{% endblock %}
+
+{% block auth_text %}
+    Escolha uma senha forte e fácil de lembrar. Sua conta ficará protegida
+    com os padrões de segurança do Django.
 {% endblock %}
 
-{% block conteudo %}
+{% block auth_body %}
+    <h2 class="auth-title">Nova senha</h2>
+    <p class="auth-subtitle">Digite e confirme sua nova senha abaixo.</p>
 
-<h2>Redefinir Senha</h2>
+    <form method="post" class="auth-form">
+        {% csrf_token %}
 
-<p>Insira sua nova senha abaixo.</p>
+        {% if form.non_field_errors %}
+            <div class="auth-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Definir nova senha</button>
-</form>
+        <div class="auth-field">
+            <label for="id_new_password1">Nova senha</label>
+            {{ form.new_password1 }}
+            {% if form.new_password1.errors %}
+                <div class="auth-errors">{{ form.new_password1.errors }}</div>
+            {% endif %}
+            {% if form.new_password1.help_text %}
+                <p class="auth-help">{{ form.new_password1.help_text }}</p>
+            {% endif %}
+        </div>
 
+        <div class="auth-field">
+            <label for="id_new_password2">Confirmar nova senha</label>
+            {{ form.new_password2 }}
+            {% if form.new_password2.errors %}
+                <div class="auth-errors">{{ form.new_password2.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="auth-submit">Definir nova senha</button>
+    </form>
 {% endblock %}

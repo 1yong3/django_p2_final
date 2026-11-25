@@ -1,22 +1,24 @@
-{% extends 'template.html' %}
+{% extends 'auth_base.html' %}
 
-{% block titulo %}
-E-mail enviado
+{% block titulo %}E-mail enviado{% endblock %}
+
+{% block auth_heading %}Confira seu e-mail{% endblock %}
+
+{% block auth_text %}
+    O link de recuperação foi enviado. Por segurança, ele expira em algumas
+    horas e só pode ser usado uma vez.
 {% endblock %}
 
-{% block conteudo %}
-
-<div style="max-width:600px;margin:40px auto;padding:0 20px;text-align:center;">
-    <h2 style="color:#6b917b;margin-bottom:15px;">Verifique seu e-mail</h2>
-
-    <p style="color:#555;line-height:1.7;">
+{% block auth_body %}
+    <h2 class="auth-title">Verifique seu e-mail</h2>
+    <p class="auth-subtitle">
         Se existir uma conta com o e-mail informado, enviamos um link para
         redefinição de senha. Confira também a caixa de spam.
     </p>
 
-    <p style="margin-top:25px;">
-        <a href="{% url 'login' %}" class="btn-back" style="text-decoration:none;">Voltar ao login</a>
-    </p>
-</div>
+    <div class="auth-note">
+        Não recebeu? Aguarde alguns minutos ou solicite novamente.
+    </div>
 
+    <a href="{% url 'login' %}" class="auth-alt-btn">Voltar ao login</a>
 {% endblock %}

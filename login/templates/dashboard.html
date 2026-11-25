@@ -29,6 +29,13 @@ Dashboard
                 <div style="color:#555;font-size:0.9rem;">Usuário</div>
             </div>
         </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;">
+            <a href="{% url 'produtos' %}" class="btn-submit" style="text-decoration:none;">Ver Produtos</a>
+            <a href="{% url 'minhas_pedidos' %}" class="btn-submit" style="text-decoration:none;background:#5a4761;">Meus Pedidos</a>
+            <a href="{% url 'quem_somos' %}" class="btn-back" style="text-decoration:none;">Quem Somos</a>
+            <a href="{% url 'contato' %}" class="btn-back" style="text-decoration:none;background:#234B35;">Contato</a>
+        </div>
     </div>
 
     <h3 style="color:#234B35;margin-bottom:15px;">Seções disponíveis</h3>

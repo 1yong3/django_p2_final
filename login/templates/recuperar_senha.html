@@ -1,19 +1,33 @@
-{% extends "template.html" %}
+{% extends 'auth_base.html' %}
 
-{% block titulo %}
-Recuperar Senha
+{% block titulo %}Recuperar Senha{% endblock %}
+
+{% block auth_heading %}Recupere seu acesso{% endblock %}
+
+{% block auth_text %}
+    Informe o e-mail cadastrado e enviaremos um link seguro para você
+    definir uma nova senha.
 {% endblock %}
 
-{% block conteudo %}
+{% block auth_body %}
+    <h2 class="auth-title">Recuperar senha</h2>
+    <p class="auth-subtitle">Digite seu e-mail para receber o link de redefinição.</p>
 
-<h2>Esqueceu a Senha</h2>
+    <form method="post" class="auth-form">
+        {% csrf_token %}
 
-<p>Digite seu e-mail para receber um link de redefinição de senha.</p>
+        <div class="auth-field">
+            <label for="id_email">E-mail</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="auth-errors">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Enviar e-mail</button>
-</form>
+        <button type="submit" class="auth-submit">Enviar link</button>
+    </form>
 
+    <div class="auth-divider"><span>lembrou a senha?</span></div>
+
+    <a href="{% url 'login' %}" class="auth-alt-btn">Voltar ao login</a>
 {% endblock %}

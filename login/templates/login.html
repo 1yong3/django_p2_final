@@ -1,49 +1,46 @@
-{% extends 'template.html' %}
+{% extends 'auth_base.html' %}
 
-{% block titulo %}
-Entrar
+{% block titulo %}Entrar{% endblock %}
+
+{% block auth_heading %}Que bom te ver de novo{% endblock %}
+
+{% block auth_text %}
+    Entre com sua conta para acompanhar pedidos, acessar o dashboard e
+    gerenciar tudo com praticidade.
 {% endblock %}
 
-{% block conteudo %}
+{% block auth_body %}
+    <h2 class="auth-title">Entrar</h2>
+    <p class="auth-subtitle">Acesse sua conta para continuar.</p>
 
-<div class="form-container" style="max-width:420px;">
-    <h2>Entrar</h2>
-
-    <form method="post" action="{% url 'login' %}">
+    <form method="post" action="{% url 'login' %}" class="auth-form">
         {% csrf_token %}
         {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
-        <div class="form-group">
+        <div class="auth-field">
             <label for="id_username">Usuário</label>
             {{ form.username }}
-            {{ form.username.errors }}
+            {% if form.username.errors %}
+                <div class="auth-errors">{{ form.username.errors }}</div>
+            {% endif %}
         </div>
 
-        <div class="form-group">
+        <div class="auth-field">
             <label for="id_password">Senha</label>
             {{ form.password }}
-            {{ form.password.errors }}
+            {% if form.password.errors %}
+                <div class="auth-errors">{{ form.password.errors }}</div>
+            {% endif %}
         </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn-submit">Entrar</button>
+        <div class="auth-links">
+            <a href="{% url 'recuperar_senha' %}">Esqueceu a senha?</a>
         </div>
+
+        <button type="submit" class="auth-submit">Entrar</button>
     </form>
 
-    <div style="text-align:center;margin-top:18px;font-size:0.9rem;">
-        <p style="margin-bottom:8px;">
-            <a href="{% url 'recuperar_senha' %}" style="color:#5a4761;">
-                Esqueceu a senha?
-            </a>
-        </p>
-    </div>
+    <div class="auth-divider"><span>ainda não tem conta?</span></div>
 
-    <div style="margin-top:24px;padding-top:20px;border-top:1px solid #eee;text-align:center;">
-        <p style="color:#666;margin-bottom:12px;">Ainda não tem uma conta?</p>
-        <a href="{% url 'cadastro' %}" class="btn-back" style="text-decoration:none;">
-            Cadastrar
-        </a>
-    </div>
-</div>
-
+    <a href="{% url 'cadastro' %}" class="auth-alt-btn">Criar uma conta</a>
 {% endblock %}
